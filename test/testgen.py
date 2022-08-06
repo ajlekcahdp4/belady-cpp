@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 ##
 
-from functools import cache
 import random
 import sys
 import getopt
