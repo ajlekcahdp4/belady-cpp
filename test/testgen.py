@@ -1,3 +1,4 @@
+#!/usr/bin/python
 ##
 # ----------------------------------------------------------------------------
 # "THE BEER-WARE LICENSE" (Revision 42):
@@ -6,11 +7,13 @@
 # this stuff is worth it, you can buy me a beer in return.       Alex Romanov
 # ----------------------------------------------------------------------------
 ##
-
+from cgi import test
 import random
 import sys
 import getopt
 import os
+
+from numpy import unsignedinteger
 
 usage_string = "gentest.py -n <num> -o output"
 
@@ -33,10 +36,85 @@ def generate_random_test(test_number):
         test_str.append(str(random.randint(0, MAX_REQUEST_VALUE)))
     return test_str
 
+
+def find (list_:list, elem:int):
+    for i in range(0, len(list_)):
+        if (list_[i] == elem):
+            return i
+    return -1
+
+class ideal_t:
+    capacity_ = 0
+    size_ = 0
+    clist_ = []
+    def __init__(self, n:int):
+        self.capacity_ = n
+        self.clist_ = [0]*n
+    
+    def dump (self):
+        print ("DUMP OF THE IDEAL_CACHE:")
+        print ("\tcapacity_ = {}".format(self.capacity_))
+        print ("\tsize_ = {}".format(self.size_))
+        print ("\tclist_ = ", end = "")
+        print ("{}".format(self.clist_))
+
+
+    def erase (self, test_list:list):
+        print ("    in erase ():")
+        assert self.capacity_ == len(self.clist_)
+
+        far = -1
+        far_i = self.size_
+        for ind in range (0, self.capacity_):
+            print ("test clist_[{}] = {}".format(ind, self.clist_[ind]))
+            soon = find (test_list, self.clist_[ind])
+            print ("soon = {}".format(soon))
+            if (soon == -1):
+                self.size_ -= 1
+                return ind
+            if (far < soon ):
+                far = soon
+                far_i = ind
+        self.size_ -= 1
+        return far_i
+                
+    def get_best_hits_count (self, test_list:list):
+        assert len(self.clist_) == self.capacity_
+
+        hits = 0
+        for request in test_list:
+            assert self.capacity_ == len(self.clist_)
+            print ("\n\n\nREQUEST = {}".format(request))
+            print ("test_list = {}".format(test_list))
+            self.dump()
+            ins_ind = self.size_
+            if (find(self.clist_, request) == -1): # cache miss
+                print ("miss((")
+                if (len(self.clist_) == self.size_):
+                    print ("erase")
+                    ins_ind = self.erase (test_list)
+                print ("insert in pos {}".format(ins_ind))
+                self.clist_[ins_ind] = request
+                self.size_ += 1
+            else:
+                print ("hit!")
+                hits += 1 # cache hit
+            test_list = test_list[1:]
+        return hits
+                
+
+                
+
+
+
 def generate_answer (test):
     cache_size = int(test[0])
     test_list = [int(request) for request in test[2:]]
-    # some code here
+    cache = ideal_t (cache_size)
+    hits = cache.get_best_hits_count (test_list)
+    return hits
+    
+            
 
 
 class CmdArgs:
@@ -76,4 +154,6 @@ def main (argv):
     generate_n_random_tests (cmd)
 
 
-main (sys.argv[1:])
+#main (sys.argv[1:])
+array = [int(x) for x in input().split()]
+print(generate_answer(array))
