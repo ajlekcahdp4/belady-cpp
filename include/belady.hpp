@@ -57,7 +57,7 @@ template <typename T, typename iterator_t> class ideal_cache_t
         auto found = inserted_set_.find (to_insert);
         if ( found == inserted_set_.end () )
         {
-            size_t insert_ind {};
+            auto insert_ind = size_;
             if ( full () )
                 insert_ind = erase ();
             insert (insert_ind, to_insert);
@@ -70,11 +70,17 @@ template <typename T, typename iterator_t> class ideal_cache_t
   private:
     size_t erase ()
     {
-        std::pair<size_t, size_t> to_erase {};
+        std::pair<size_t, size_t> to_erase {0, 0};
 
         for ( auto i = 0; i < cvec_.size (); i++ )
         {
-            auto found      = occur_map_.find (cvec_[i]);
+            auto found = occur_map_.find (cvec_[i]);
+            if ( found == occur_map_.end () )
+            {
+                inserted_set_.erase (cvec_[i]);
+                size_--;
+                return i;
+            }
             auto found_soon = found->second[0];
             if ( found_soon > to_erase.first )
             {
@@ -82,25 +88,32 @@ template <typename T, typename iterator_t> class ideal_cache_t
                 to_erase.second = i;
             }
         }
+        assert (to_erase.second <= cvec_.size ());
+        inserted_set_.erase (cvec_[to_erase.second]);
+        size_--;
 
-        inserted_set_.erase (cvec_[to_erase.first]);
-        return to_erase.first;
+        return to_erase.second;
     }
 
     void insert (size_t ind, const T &to_insert)
     {
-        cvec_[ind] = to_insert;
+        if ( !full () )   // to optimize
+            cvec_.push_back (to_insert);
+        else
+            cvec_[ind] = to_insert;
         inserted_set_.insert (to_insert);
-        auto found = occur_map_.find (to_insert);
-        assert (found != occur_map_.end ());
-        found->second.pop_front ();
+        promote (to_insert);
+        size_++;
     }
 
     void promote (const T &to_promote)
     {
         auto found = occur_map_.find (to_promote);
         assert (found != occur_map_.end ());
-        found->second.pop_front ();
+        auto que = found->second;
+        que.pop_front ();
+        if ( que.empty () )
+            occur_map_.erase (to_promote);
     }
 };
 
