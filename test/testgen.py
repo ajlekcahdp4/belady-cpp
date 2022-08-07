@@ -18,9 +18,9 @@ from numpy import unsignedinteger
 usage_string = "gentest.py -n <num> -o output"
 
 
-MAX_REQUEST_VALUE = 5
-MAX_CACHE_SIZE = 3
-MAX_REQUESTS_NUMBER = 10
+MAX_REQUEST_VALUE = 200
+MAX_CACHE_SIZE = 50
+MAX_REQUESTS_NUMBER = 10000
 
 
 
