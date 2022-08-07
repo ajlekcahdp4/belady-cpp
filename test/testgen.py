@@ -51,24 +51,15 @@ class ideal_t:
         self.capacity_ = n
         self.clist_ = [-1]*n
     
-    #def dump (self):
-        ##print ("DUMP OF THE IDEAL_CACHE:")
-        #print ("\tcapacity_ = {}".format(self.capacity_))
-        #print ("\tsize_ = {}".format(self.size_))
-        #print ("\tclist_ = ", end = "")
-        #print ("{}".format(self.clist_))
 
 
     def erase (self, test_list:list):
-        #print ("    in erase ():")
         assert self.capacity_ == len(self.clist_)
 
         far = -1
         far_i = self.size_
         for ind in range (0, self.capacity_):
-            #print ("test clist_[{}] = {}".format(ind, self.clist_[ind]))
             soon = find (test_list, self.clist_[ind])
-            #print ("soon = {}".format(soon))
             if (soon == -1):
                 self.size_ -= 1
                 return ind
@@ -84,20 +75,13 @@ class ideal_t:
         hits = 0
         for request in test_list:
             assert self.capacity_ == len(self.clist_)
-            #print ("\n\n\nREQUEST = {}".format(request))
-            #print ("test_list = {}".format(test_list))
-            #self.dump()
             ins_ind = self.size_
             if (find(self.clist_, request) == -1): # cache miss
-                #print ("miss((")
                 if (len(self.clist_) == self.size_):
-                    #print ("erase")
                     ins_ind = self.erase (test_list)
-                #print ("insert in pos {}".format(ins_ind))
                 self.clist_[ins_ind] = request
                 self.size_ += 1
             else:
-                #print ("hit!")
                 hits += 1 # cache hit
             test_list = test_list[1:]
         return hits
@@ -141,11 +125,11 @@ def main (argv):
     try :
         opts, args = getopt.getopt(argv, "hn:o:")
     except getopt.GetoptError:
-        #print (usage_string)
+        print (usage_string)
         sys.exit()
     for opt, arg in opts:
         if opt in ("-h", "--help"):
-            #print (usage_string)
+            print (usage_string)
             sys.exit()
         if opt in ("-o", "--output"):
             cmd.output_path = str(arg)
@@ -154,6 +138,4 @@ def main (argv):
     generate_n_random_tests (cmd)
 
 
-#main (sys.argv[1:])
-array = [int(x) for x in input().split()]
-print(generate_answer(array), end = "")
+main (sys.argv[1:])
