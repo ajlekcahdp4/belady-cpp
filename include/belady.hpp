@@ -57,7 +57,7 @@ template <typename T, typename iterator_t> class ideal_cache_t
         auto found = inserted_set_.find (to_insert);
         if ( found == inserted_set_.end () )
         {
-            auto insert_ind = size_;
+            auto insert_ind = -1;
             if ( full () )
                 insert_ind = erase ();
             insert (insert_ind, to_insert);
@@ -97,7 +97,7 @@ template <typename T, typename iterator_t> class ideal_cache_t
 
     void insert (size_t ind, const T &to_insert)
     {
-        if ( !full () )   // to optimize
+        if ( ind == -1 )   // to optimize
             cvec_.push_back (to_insert);
         else
             cvec_[ind] = to_insert;
@@ -110,7 +110,7 @@ template <typename T, typename iterator_t> class ideal_cache_t
     {
         auto found = occur_map_.find (to_promote);
         assert (found != occur_map_.end ());
-        auto que = found->second;
+        auto &que = found->second;
         que.pop_front ();
         if ( que.empty () )
             occur_map_.erase (to_promote);
